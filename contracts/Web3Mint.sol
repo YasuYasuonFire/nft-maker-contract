@@ -6,13 +6,11 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 //OpenZeppelinが提供するヘルパー機能をインポートします。
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-import "./libraries/Base64.sol";
+//import "./libraries/Base64.sol";
 import "hardhat/console.sol";
 contract Web3Mint is ERC721{
     struct NftAttributes{
-        string name;
-        string description;
-        string imageURL;
+        string metadataURI;
     }
 
     NftAttributes[] Web3Nfts;
@@ -27,35 +25,17 @@ contract Web3Mint is ERC721{
 
     // ユーザーが NFT を取得するために実行する関数です。
 
-    function mintIpfsNFT(string memory name, string memory description, string memory imageURI) public{
+    function mintIpfsNFT(string memory metadataURI) public{
         uint256 newItemId = _tokenIds.current();
         _safeMint(msg.sender,newItemId);
         Web3Nfts.push(NftAttributes({
-            name: name,
-            description: description,
-            imageURL: imageURI
+            metadataURI: metadataURI
         }));
         console.log("An NFT w/ ID %s has been minted to %s", newItemId, msg.sender);
         _tokenIds.increment();
     }
     function tokenURI(uint256 _tokenId) public override view returns(string memory){
-        string memory json = Base64.encode(
-            bytes(
-                string(
-                    abi.encodePacked(
-                        '{"name": "',
-                        Web3Nfts[_tokenId].name,
-                        '", "description": "',
-                        Web3Nfts[_tokenId].description,
-                        '", "image": "ipfs://',
-                        Web3Nfts[_tokenId].imageURL,'"}'
-                    )
-                )
-            )
-        );
-        string memory output = string(
-                abi.encodePacked("data:application/json;base64,", json)
-            );
+        string memory output = Web3Nfts[_tokenId].metadataURI;
         return output;
     }
 }
