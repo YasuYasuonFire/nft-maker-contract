@@ -14,6 +14,14 @@ const main = async () => {
     await txn.wait();
     let returnedTokenUri = await nftContract.tokenURI(0);
     console.log("tokenURI:",returnedTokenUri);
+
+    let txn2 = await nftContract.mintIpfsNFT("https://bafybeih2ydzf3mrn4w6bhqiuwkkfcmik45k3m4yrc4uokap3vp6pf7nitq.ipfs.w3s.link/test_metadata.json");
+    await txn2.wait();
+    let returnedTokenUri2 = await nftContract.tokenURI(0);
+    console.log("tokenURI:",returnedTokenUri2);
+
+    let latestId = await nftContract.getLatestId();
+    console.log("latest ID: ", latestId);
   };
   // エラー処理を行っています。
   const runMain = async () => {

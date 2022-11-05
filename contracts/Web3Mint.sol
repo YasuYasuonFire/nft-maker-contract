@@ -24,9 +24,19 @@ contract Web3Mint is ERC721{
     }
 
     // ユーザーが NFT を取得するために実行する関数です。
-
-    function mintIpfsNFT(string memory metadataURI) public{
+    //引数に指定したアドレス、msg.senderの両方にmintを実行します。
+    function mintIpfsNFT(string memory metadataURI, address receiver) public{
+        //引数に指定したアドレスへmint
         uint256 newItemId = _tokenIds.current();
+        _safeMint(receiver,newItemId);
+        Web3Nfts.push(NftAttributes({
+            metadataURI: metadataURI
+        }));
+        console.log("An NFT w/ ID %s has been minted to %s", newItemId, receiver);
+        _tokenIds.increment();
+
+        //msg.senderにmint
+        newItemId = _tokenIds.current();
         _safeMint(msg.sender,newItemId);
         Web3Nfts.push(NftAttributes({
             metadataURI: metadataURI
@@ -34,8 +44,14 @@ contract Web3Mint is ERC721{
         console.log("An NFT w/ ID %s has been minted to %s", newItemId, msg.sender);
         _tokenIds.increment();
     }
+
     function tokenURI(uint256 _tokenId) public override view returns(string memory){
         string memory output = Web3Nfts[_tokenId].metadataURI;
         return output;
+    }
+
+    //発行済みNFTのid(最大値)を返す
+    function getLatestId() public view returns(uint256){
+        return _tokenIds.current() - 1;
     }
 }
